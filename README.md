@@ -18,7 +18,7 @@ Proof-of-concept CLI that takes a campaign brief (JSON/YAML), reuses provided pr
 Create a virtualenv and install dependencies:
 
 ```bash
-cd /Users/mwilker/projects/fde-creative-pipeline-lite
+cd /path/to/your-project
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ## Run the web app (recommended)
 
 ```bash
-cd /Users/mwilker/projects/fde-creative-pipeline-lite
+cd /path/to/your-project
 source .venv/bin/activate
 streamlit run app.py
 ```
@@ -149,4 +149,6 @@ Aspect ratio keys:
 - GenAI prompt is intentionally simple; no brand kit ingestion, logos, or localization pipeline.
 - “Localization” translates the campaign message into target languages inferred from the `region` values.
 - Brand/legal checks are heuristics, not production-grade validation.
+- Limited to OpenAI API Key, allow other AI API Keys for future and scalability.
+- Upgrade to "Agentic" workflow in next versions for more automated features and scalability.
 
