@@ -1,0 +1,19 @@
+{
+  "campaign_name": "summer_refresh",
+  "region": "US",
+  "audience": "young professionals",
+  "message": "Stay refreshed this summer!",
+  "image_prompt": "Photoreal lifestyle. Summer afternoon. Bright natural light. Product centered on a clean surface. Condensation droplets. Subtle bokeh background. Brand-safe, minimal, premium.",
+  "products": [
+    {
+      "name": "SparkleWater",
+      "asset": "sparklewater.png",
+      "image_prompt": "Sparkling water vibe: cool blue accents, citrus garnish, refreshing mist."
+    },
+    {
+      "name": "FreshJuice",
+      "asset": null,
+      "image_prompt": "Fresh juice vibe: vibrant oranges/yellows, sliced fruit, morning energy."
+    }
+  ]
+}

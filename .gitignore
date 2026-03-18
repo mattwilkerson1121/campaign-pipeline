@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.py[cod]
+
+# Streamlit / app runtime artifacts
+logs/
+outputs/
+outputs_test*/
+regen_test/
+
+# Local history / editor artifacts
+.history/
+
