@@ -64,6 +64,7 @@ _DEFAULTS: dict[str, str] = {
     "regions_text": "US",
     "audience": "young professionals",
     "message": "Stay refreshed this summer!",
+    "overlay_text": "",
     "products_text": "SparkleWater\nFreshJuice",
     "art_direction": "Photoreal lifestyle, bright natural light, minimal premium background.",
 }
@@ -106,6 +107,9 @@ with st.sidebar:
                     if isinstance(data.get("message"), str):
                         st.session_state["message"] = data["message"]
 
+                    if "overlay_text" in data and isinstance(data.get("overlay_text"), str):
+                        st.session_state["overlay_text"] = data["overlay_text"]
+
                     # App field name is `image_prompt`, but sidebar label is "Image art direction prompt".
                     if isinstance(data.get("image_prompt"), str):
                         st.session_state["art_direction"] = data["image_prompt"]
@@ -136,6 +140,12 @@ with st.sidebar:
     )
     audience = st.text_input("Target audience", key="audience")
     message = st.text_area("Campaign message", key="message")
+    overlay_text = st.text_area(
+        "Text overlay (on image)",
+        height=70,
+        key="overlay_text",
+        help="Optional. Text shown on the creative image. If empty, the campaign message is used.",
+    )
 
     regions: list[str] = []
     try:
@@ -287,6 +297,7 @@ def _run_generation() -> dict:
             "region": regions,
             "audience": audience,
             "message": message,
+            "overlay_text": (overlay_text or "").strip() or None,
             "image_prompt": art_direction,
             "products": products_with_assets,
         }
@@ -349,11 +360,14 @@ with right:
             for p in [pr["name"] for pr in products]:
                 st.markdown(f"### {p}")
                 ratio_cols = st.columns(3)
-                ratio_keys = ["1_1", "9_16", "16_9"]
+                # The pipeline writes aspect ratio directories using the keys from
+                # `creative_pipeline.image_ops.ASPECT_RATIOS` (e.g. "1:1", "9:16", "16:9").
+                ratio_keys = ["1:1", "9:16", "16:9"]
+                caption_keys = {"1:1": "1_1", "9:16": "9_16", "16:9": "16_9"}
                 for idx, rk in enumerate(ratio_keys):
                     img_path = Path("outputs") / campaign_name / _safe_region_dir_name(r) / p / rk / "ad.png"
                     with ratio_cols[idx]:
-                        st.caption(rk)
+                        st.caption(caption_keys.get(rk, rk))
                         if img_path.exists():
                             st.image(str(img_path), use_container_width=True)
                             st.code(str(img_path), language=None)

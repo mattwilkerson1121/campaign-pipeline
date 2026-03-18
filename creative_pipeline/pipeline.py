@@ -9,7 +9,7 @@ from PIL import Image
 from creative_pipeline.brief import CampaignBrief, load_brief
 from creative_pipeline.checks import brand_compliance_check, legal_word_check
 from creative_pipeline.genai import GenAIResult, generate_hero_image, load_image
-from creative_pipeline.image_ops import ASPECT_RATIOS, OverlaySpec, add_text_overlay, cover_resize, ensure_dir, overlay_logo
+from creative_pipeline.image_ops import ASPECT_RATIOS, OverlaySpec, add_text_overlay, contain_resize, ensure_dir, overlay_logo
 
 
 def _resolve_asset_path(product_name: str, asset_field: str | None, assets_dir: Path) -> Path | None:
@@ -276,16 +276,23 @@ def run_pipeline(
         for region in brief.regions:
             region_dir = _safe_region_dir_name(region)
             final_message = region_messages[region]
+            overlay_text = (brief.overlay_text or "").strip() or None
 
             product_out_root = outputs_dir / brief.campaign_name / region_dir / product.name
 
             for ratio_key, (tw, th) in ASPECT_RATIOS.items():
                 logger.info("Creating {} variant for {} ({})", ratio_key, product.name, region)
-                variant = cover_resize(hero.image, tw, th)
+                variant = contain_resize(
+                    hero.image,
+                    tw,
+                    th,
+                    background_hex=brand_primary_hex,
+                )
                 variant = add_text_overlay(
                     variant,
                     OverlaySpec(
                         message=final_message,
+                        overlay_text=overlay_text,
                         product_name=product.name,
                         company_name=company_name,
                         brand_hex=brand_primary_hex,

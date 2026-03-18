@@ -131,9 +131,9 @@ Outputs are written to:
 `outputs/<campaign_name>/<region>/<product_name>/<aspect_ratio_key>/ad.png`
 
 Aspect ratio keys:
-- `1_1` (1024×1024)
-- `9_16` (1080×1920)
-- `16_9` (1920×1080)
+- `1:1` (1024×1024)
+- `9:16` (1080×1920)
+- `16:9` (1920×1080)
 
 ## Design decisions
 
