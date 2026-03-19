@@ -157,3 +157,10 @@ Aspect ratio keys:
 -- No image editing or "vision" for altering base product image asset.
 -- Re-Engineer prompt settings to fine-tune results to fill the frame of different sizes.
 
+## Version 2
+- Automation / Agentic Enhancement
+-- Detect when brief is added to / saved to directory and kick-off process
+- Notification system for issues, completion, etc.
+- Enhance and fine-tune computer vision for placing products in different settings
+- Allow for various templated designs
+
