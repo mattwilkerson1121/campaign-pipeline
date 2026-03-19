@@ -155,4 +155,5 @@ Aspect ratio keys:
 - Upgrade to "Agentic" workflow in next versions for more automated features and scalability.
 - Takes a while to generate campaign images/ad and no stream data during generation.
 -- No image editing or "vision" for altering base product image asset.
+-- Re-Engineer prompt settings to fine-tune results to fill the frame of different sizes.
 
