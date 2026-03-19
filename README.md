@@ -153,4 +153,5 @@ Aspect ratio keys:
 - Brand/legal checks are heuristics, not production-grade validation.
 - Limited to OpenAI API Key, allow other AI API Keys for future and scalability.
 - Upgrade to "Agentic" workflow in next versions for more automated features and scalability.
+- Takes a while to generate campaign images/ad and no stream data during generation
 
