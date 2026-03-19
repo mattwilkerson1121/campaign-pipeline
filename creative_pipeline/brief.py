@@ -20,7 +20,6 @@ class CampaignBrief:
     regions: list[str]
     audience: str
     message: str
-    overlay_text: str | None  # Optional text shown on the image; if None/empty, message is used
     image_prompt: str | None
     products: list[ProductBrief]
 
@@ -81,16 +80,11 @@ def load_brief(path: Path) -> CampaignBrief:
             ProductBrief(name=str(p["name"]), asset=asset, image_prompt=image_prompt)
         )
 
-    overlay_text = data.get("overlay_text")
-    if overlay_text is not None and not isinstance(overlay_text, str):
-        overlay_text = None
-
     return CampaignBrief(
         campaign_name=str(data["campaign_name"]),
         regions=_parse_regions_field(data["region"]),
         audience=str(data["audience"]),
         message=str(data["message"]),
-        overlay_text=overlay_text.strip() if (overlay_text and str(overlay_text).strip()) else None,
         image_prompt=str(data["image_prompt"]) if data.get("image_prompt") else None,
         products=products,
     )

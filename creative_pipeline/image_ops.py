@@ -60,7 +60,6 @@ class OverlaySpec:
     product_name: str
     company_name: str | None = None
     brand_hex: str | None = None
-    overlay_text: str | None = None  # Optional text drawn on the image (above the banner)
 
 
 def _wrap_text_to_width(draw: ImageDraw.Draw, text: str, font: ImageFont.FreeTypeFont | ImageFont.ImageFont, max_px_width: int) -> list[str]:
@@ -128,47 +127,6 @@ def add_text_overlay(img: Image.Image, spec: OverlaySpec) -> Image.Image:
     min_font_big = 14
     min_font_small = 12
     max_lines = 5
-
-    # ---- Overlay text on the image (above the banner) ----
-    overlay_str = (spec.overlay_text or "").strip()
-    if overlay_str:
-        overlay_zone_top = pad
-        overlay_zone_bottom = banner_top - pad
-        overlay_zone_height = max(1, overlay_zone_bottom - overlay_zone_top)
-        overlay_width = content_width
-        font_overlay_size = max(min_font_big, int(h * 0.055))
-        overlay_lines: list[str] = []
-        font_overlay = None
-        for try_size in range(font_overlay_size, min_font_big - 1, -2):
-            try:
-                font_overlay = ImageFont.truetype("Arial.ttf", size=try_size)
-            except Exception:
-                font_overlay = ImageFont.load_default()
-            raw = _wrap_text_to_width(draw, overlay_str, font_overlay, overlay_width)
-            overlay_lines = raw[:max_lines]
-            block_h = _text_block_height(draw, overlay_lines, font_overlay, line_spacing=1.25)
-            if block_h <= overlay_zone_height:
-                break
-        if font_overlay is None:
-            try:
-                font_overlay = ImageFont.truetype("Arial.ttf", size=min_font_big)
-            except Exception:
-                font_overlay = ImageFont.load_default()
-            overlay_lines = _wrap_text_to_width(draw, overlay_str, font_overlay, overlay_width)[:max_lines]
-        # Center overlay text vertically in the image zone; draw shadow then text for legibility
-        total_overlay_h = _text_block_height(draw, overlay_lines, font_overlay, line_spacing=1.25)
-        y_overlay = overlay_zone_top + (overlay_zone_height - total_overlay_h) // 2
-        shadow_offset = max(1, int(h * 0.004))
-        for line in overlay_lines:
-            bbox = draw.textbbox((0, 0), line, font=font_overlay)
-            line_h = bbox[3] - bbox[1]
-            if y_overlay + line_h > overlay_zone_bottom:
-                break
-            line_w = bbox[2] - bbox[0]
-            x_center = content_left + (content_width - line_w) // 2
-            draw.text((x_center + shadow_offset, y_overlay + shadow_offset), line, font=font_overlay, fill=(0, 0, 0, 180))
-            draw.text((x_center, y_overlay), line, font=font_overlay, fill=(255, 255, 255, 250))
-            y_overlay += int(line_h * 1.25)
 
     # ---- Banner: product line + campaign message ----
     try:

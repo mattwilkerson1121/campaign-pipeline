@@ -47,11 +47,6 @@ def main(argv: list[str] | None = None) -> int:
         help="OpenAI image model to use (default: gpt-image-1).",
     )
     parser.add_argument(
-        "--openai-image-size",
-        default="1024x1024",
-        help="OpenAI image size (default: 1024x1024).",
-    )
-    parser.add_argument(
         "--image-prompt",
         default=None,
         help="Optional: extra guidance appended to the image generation prompt.",
@@ -74,7 +69,6 @@ def main(argv: list[str] | None = None) -> int:
         enable_genai=not args.no_genai,
         openai_api_key=args.openai_api_key,
         openai_image_model=args.openai_image_model,
-        openai_image_size=args.openai_image_size,
         image_prompt_override=args.image_prompt,
     )
 

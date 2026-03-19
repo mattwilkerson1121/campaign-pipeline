@@ -72,11 +72,13 @@ Or pass it directly (overrides the env var):
 python3 main.py --brief examples/brief.json --openai-api-key "YOUR_KEY"
 ```
 
-You can also tune the model/size:
+You can also tune the model:
 
 ```bash
-python3 main.py --brief examples/brief.json --openai-image-model gpt-image-1 --openai-image-size 1024x1024
+python3 main.py --brief examples/brief.json --openai-image-model gpt-image-1
 ```
+
+The pipeline always generates one hero image per target aspect ratio (1:1, 9:16, 16:9).
 
 You can also provide extra prompt guidance from the CLI:
 

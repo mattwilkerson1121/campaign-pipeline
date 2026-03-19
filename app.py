@@ -64,9 +64,8 @@ _DEFAULTS: dict[str, str] = {
     "regions_text": "US",
     "audience": "young professionals",
     "message": "Stay refreshed this summer!",
-    "overlay_text": "",
     "products_text": "SparkleWater\nFreshJuice",
-    "art_direction": "Photoreal lifestyle, bright natural light, minimal premium background.",
+    "art_direction": "",
 }
 for k, v in _DEFAULTS.items():
     if k not in st.session_state:
@@ -107,9 +106,6 @@ with st.sidebar:
                     if isinstance(data.get("message"), str):
                         st.session_state["message"] = data["message"]
 
-                    if "overlay_text" in data and isinstance(data.get("overlay_text"), str):
-                        st.session_state["overlay_text"] = data["overlay_text"]
-
                     # App field name is `image_prompt`, but sidebar label is "Image art direction prompt".
                     if isinstance(data.get("image_prompt"), str):
                         st.session_state["art_direction"] = data["image_prompt"]
@@ -140,12 +136,6 @@ with st.sidebar:
     )
     audience = st.text_input("Target audience", key="audience")
     message = st.text_area("Campaign message", key="message")
-    overlay_text = st.text_area(
-        "Text overlay (on image)",
-        height=70,
-        key="overlay_text",
-        help="Optional. Text shown on the creative image. If empty, the campaign message is used.",
-    )
 
     regions: list[str] = []
     try:
@@ -189,21 +179,21 @@ with st.sidebar:
 
     st.subheader("GenAI art direction")
     art_direction = st.text_area(
-        "Image art direction prompt",
+        "Describe What You Want to Create",
         height=110,
         key="art_direction",
+        help="Optional. Leave blank to use the model defaults.",
     )
 
     st.subheader("OpenAI")
     openai_api_key = st.text_input("OpenAI API key", value="", type="password")
     openai_model = st.text_input("Image model", value="gpt-image-1")
-    openai_size = st.selectbox("Image size", options=["1024x1024", "1536x1024", "1024x1536"], index=0)
 
     col_a, col_b = st.columns(2)
     with col_a:
-        generate_clicked = st.button("Generate creative", type="primary", use_container_width=True)
+        generate_clicked = st.button("Generate creative", type="primary", width="stretch")
     with col_b:
-        regenerate_clicked = st.button("Regenerate", use_container_width=True)
+        regenerate_clicked = st.button("Regenerate", width="stretch")
 
     st.divider()
     st.write("Outputs are written to `outputs/<campaign>/<region>/<product>/<ratio>/ad.png`.")
@@ -236,14 +226,14 @@ with left:
             pn_img = _load_uploaded_image(up)
             if pn_img is not None:
                 st.write(f"**Asset for {pn}:**")
-                st.image(pn_img, use_container_width=True)
+                st.image(pn_img, width="stretch")
 
     if logo_img is not None:
         st.write("**Logo:**")
-        st.image(logo_img, use_container_width=True)
+        st.image(logo_img, width="stretch")
     if seed_img is not None:
         st.write("**Seed image:**")
-        st.image(seed_img, use_container_width=True)
+        st.image(seed_img, width="stretch")
 
 
 def _run_generation() -> dict:
@@ -297,7 +287,6 @@ def _run_generation() -> dict:
             "region": regions,
             "audience": audience,
             "message": message,
-            "overlay_text": (overlay_text or "").strip() or None,
             "image_prompt": art_direction,
             "products": products_with_assets,
         }
@@ -317,7 +306,6 @@ def _run_generation() -> dict:
                 enable_genai=True,
                 openai_api_key=openai_api_key.strip() or None,
                 openai_image_model=openai_model.strip() or "gpt-image-1",
-                openai_image_size=openai_size,
                 image_prompt_override=None,
                 company_name=company_name.strip() or None,
                 brand_primary_hex=brand_primary,
@@ -369,7 +357,7 @@ with right:
                     with ratio_cols[idx]:
                         st.caption(caption_keys.get(rk, rk))
                         if img_path.exists():
-                            st.image(str(img_path), use_container_width=True)
+                            st.image(str(img_path), width="stretch")
                             st.code(str(img_path), language=None)
                         else:
                             st.info("Not generated yet.")

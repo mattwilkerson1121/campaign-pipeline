@@ -54,7 +54,7 @@ def generate_hero_image(
     extra_block = f"\nAdditional guidance:\n{extra}\n" if extra else ""
 
     prompt = (
-        "Create a clean commercial product advertising hero image.\n"
+        "Create ad campaign photograph, marketing image, full-bleed, fills the entire ad canvas, product advertising hero image, in 3 different aspect rations (1:1 square, 9:16 vertical, and 16:9 horizontal). Make sure to fill the entire canvas and not just the product. The product should be the main focus of the image, and the background should stretch to fill the entire canvas. Do not create multiple shots in the same image.\n"
         f"Product: {product_name}\n"
         f"Target audience: {audience}\n"
         f"Campaign message (do not render as text): {campaign_message}\n"

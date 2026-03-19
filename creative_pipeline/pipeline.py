@@ -224,7 +224,6 @@ def run_pipeline(
     enable_genai: bool,
     openai_api_key: str | None,
     openai_image_model: str,
-    openai_image_size: str,
     image_prompt_override: str | None,
     company_name: str | None = None,
     brand_primary_hex: str | None = None,
@@ -232,6 +231,15 @@ def run_pipeline(
     seed_image: Image.Image | None = None,
     regenerate_assets: bool = False,
 ) -> dict:
+    # OpenAI supports only a limited set of pixel sizes. We generate one hero image
+    # per target aspect ratio so composition stays consistent when we place it
+    # into the final creative formats.
+    ratio_to_openai_image_size: dict[str, str] = {
+        "1:1": "1024x1024",
+        "9:16": "1024x1536",
+        "16:9": "1536x1024",
+    }
+
     brief = load_brief(brief_path)
     warnings: list[str] = []
 
@@ -256,32 +264,44 @@ def run_pipeline(
     for product in brief.products:
         asset_path = _resolve_asset_path(product.name, product.asset, assets_dir)
         image_prompt = image_prompt_override or product.image_prompt or brief.image_prompt
-        hero = _generate_or_load_hero(
-            brief=brief,
-            product_name=product.name,
-            asset_path=asset_path,
-            enable_genai=enable_genai,
-            openai_api_key=openai_api_key,
-            openai_image_model=openai_image_model,
-            openai_image_size=openai_image_size,
-            image_prompt=image_prompt,
-            seed_image=seed_image,
-            regenerate_assets=regenerate_assets,
-        )
-        logger.info("Hero image provider for {}: {}", product.name, hero.used_provider)
+        heroes_by_ratio: dict[str, GenAIResult] = {}
+        for ratio_key in ASPECT_RATIOS.keys():
+            heroes_by_ratio[ratio_key] = _generate_or_load_hero(
+                brief=brief,
+                product_name=product.name,
+                asset_path=asset_path,
+                enable_genai=enable_genai,
+                openai_api_key=openai_api_key,
+                openai_image_model=openai_image_model,
+                openai_image_size=ratio_to_openai_image_size[ratio_key],
+                image_prompt=image_prompt,
+                seed_image=seed_image,
+                regenerate_assets=regenerate_assets,
+            )
+            logger.info(
+                "Hero image provider for {} ({}) : {}",
+                product.name,
+                ratio_key,
+                heroes_by_ratio[ratio_key].used_provider,
+            )
 
+        generated_image = any(h.used_provider != "input-asset" for h in heroes_by_ratio.values())
         warnings.extend(
-            brand_compliance_check(asset_path=asset_path, image=hero.image).warnings
+            brand_compliance_check(
+                image=heroes_by_ratio.get("1:1", next(iter(heroes_by_ratio.values()))).image,
+                logo_image_provided=logo_image is not None,
+                generated_image=generated_image,
+            ).warnings
         )
         for region in brief.regions:
             region_dir = _safe_region_dir_name(region)
             final_message = region_messages[region]
-            overlay_text = (brief.overlay_text or "").strip() or None
 
             product_out_root = outputs_dir / brief.campaign_name / region_dir / product.name
 
             for ratio_key, (tw, th) in ASPECT_RATIOS.items():
                 logger.info("Creating {} variant for {} ({})", ratio_key, product.name, region)
+                hero = heroes_by_ratio[ratio_key]
                 variant = contain_resize(
                     hero.image,
                     tw,
@@ -292,7 +312,6 @@ def run_pipeline(
                     variant,
                     OverlaySpec(
                         message=final_message,
-                        overlay_text=overlay_text,
                         product_name=product.name,
                         company_name=company_name,
                         brand_hex=brand_primary_hex,
