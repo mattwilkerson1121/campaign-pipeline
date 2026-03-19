@@ -160,6 +160,7 @@ Aspect ratio keys:
 ## Version 2
 - Automation / Agentic Enhancement
 -- Detect when brief is added to / saved to directory and kick-off process
+-- Run steps/process in parallel
 - Notification system for issues, completion, etc.
 - Enhance and fine-tune computer vision for placing products in different settings
 - Allow for various templated designs
